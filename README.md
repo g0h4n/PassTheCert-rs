@@ -56,6 +56,14 @@ Two transports are supported: **LDAPS on 636** (`--ldaps`, implicit Schannel map
 
 More examples and the full list of actions are on the [help page](HELP.md).
 
+## Demo
+
+<p align="center">
+    <picture>
+        <img src="./img/demo-passthecert-rs.gif" alt="passthecert-rs demo" />
+    </picture>
+</p>
+
 # Actions
 
 | Action | Description |
