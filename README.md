@@ -12,13 +12,13 @@
 
 <hr />
 
-**PassTheCert-rs** is a cross-platform, pure-Rust implementation of the [PassTheCert](https://github.com/AlmondOffSec/PassTheCert) technique: it authenticates to an LDAP/S server with a **client certificate** through Schannel, and performs a set of LDAP attack actions over that certificate-authenticated session — no password, no NT hash, no PKINIT.
+**PassTheCert-rs** is a cross-platform, pure-Rust implementation of the [PassTheCert](https://github.com/AlmondOffSec/PassTheCert) technique: it authenticates to an LDAP/S server with a **client certificate** through Schannel, and performs a set of LDAP attack actions over that certificate-authenticated session, no password, no NT hash, no PKINIT.
 
 It was built to prototype Pass-the-Certificate support for [RustHound-CE](https://github.com/g0h4n/RustHound-CE) ([issue #31](https://github.com/g0h4n/RustHound-CE/issues/31)), and uses the same TLS stack (`ldap3` + `rustls`). The Kerberos-less certificate authentication is useful when a Domain Controller does not support PKINIT (e.g. its certificate lacks the Smart Card Logon EKU) but LDAP over Schannel is available. Because authentication happens through Schannel, it also works where LDAP Channel Binding is enforced.
 
-- [HELP.md](HELP.md) — How to compile it? How to use it? All actions with examples.
-- [ROADMAP.md](ROADMAP.md) — Implemented actions and planned evolutions.
-- [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute to the project.
+- [HELP.md](HELP.md) - How to compile it? How to use it? All actions with examples.
+- [ROADMAP.md](ROADMAP.md) - Implemented actions and planned evolutions.
+- [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute to the project.
 
 # Quick usage
 
@@ -52,7 +52,7 @@ passthecert-rs -d DOMAIN.LOCAL -f DC01.DOMAIN.LOCAL --crt user.crt --key user.ke
 
 ```
 
-Two transports are supported: **LDAPS on 636** (`--ldaps`, implicit Schannel mapping) and **StartTLS on 389** (default, SASL EXTERNAL). Some Domain Controllers accept only one of the two — see [HELP.md](HELP.md).
+Two transports are supported: **LDAPS on 636** (`--ldaps`, implicit Schannel mapping) and **StartTLS on 389** (default, SASL EXTERNAL). Some Domain Controllers accept only one of the two, see [HELP.md](HELP.md).
 
 More examples and the full list of actions are on the [help page](HELP.md).
 
