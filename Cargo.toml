@@ -1,0 +1,30 @@
+[package]
+name = "passthecert-rs"
+version = "1.0.0"
+edition = "2021"
+description = "Pass-the-Certificate (Schannel) authentication and LDAP attack actions in pure Rust (RustHound-CE issue #31)"
+license = "MIT"
+
+[[bin]]
+name = "passthecert-rs"
+path = "src/main.rs"
+
+[dependencies]
+tokio      = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }
+clap       = "4.5"
+anyhow     = "1"
+log        = "0.4"
+env_logger = "0.11"
+rand       = "0.8"
+hex        = "0.4"
+
+# Same TLS stack as RustHound 2.5.11: ldap3 + rustls (ring).
+ldap3 = { version = "0.12.1", default-features = false, features = ["tls-rustls-ring"] }
+
+# rustls pieces (aligned with what ldap3 0.12.1 pulls: rustls 0.23, pki-types 1).
+rustls           = { version = "0.23", default-features = false, features = ["ring", "std"] }
+rustls-pemfile   = "2"
+rustls-pki-types = "1"
+
+# PKCS#12 (.pfx) parsing, pure Rust.
+p12-keystore = "0.3"
