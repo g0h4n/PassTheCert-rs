@@ -30,4 +30,4 @@ rustls-pki-types = "1"
 p12-keystore = "0.3"
 
 # RustHound-CE
-rusthound-ce = { version = "2.5.13"}
+rusthound-ce = { version = "2.5.13", default-features = false, features = ["nogssapi"] }
