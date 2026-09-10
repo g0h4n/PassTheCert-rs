@@ -75,6 +75,7 @@ More examples and the full list of actions are on the [help page](HELP.md).
 | `add_member` / `remove_member` | Add or remove a group member. |
 | `enable_account` / `disable_account` | Toggle the account's ACCOUNTDISABLE flag. |
 | `read_rbcd` / `write_rbcd` / `remove_rbcd` / `flush_rbcd` | Manage Resource-Based Constrained Delegation. |
+| `rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 See [HELP.md](HELP.md) for a full table with example commands.
 
