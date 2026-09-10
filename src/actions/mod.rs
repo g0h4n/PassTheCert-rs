@@ -9,3 +9,4 @@ pub mod modify_user;
 pub mod rbcd;
 pub mod sd;
 pub mod whoami;
+pub mod rusthound_ce;

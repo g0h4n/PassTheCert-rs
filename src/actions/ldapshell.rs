@@ -11,7 +11,7 @@ use anyhow::Result;
 use ldap3::{Ldap, Scope, SearchEntry};
 use log::warn;
 
-use crate::actions::{account, add_computer, group, modify_user, rbcd, whoami};
+use crate::actions::{account, add_computer, group, modify_user, rbcd, rusthound_ce, whoami};
 use crate::args::Options;
 
 pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
@@ -69,6 +69,9 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
             "remove_rbcd" => run_rbcd(ldap, base_opts, rest, "remove").await,
             "flush_rbcd" => run_rbcd(ldap, base_opts, rest, "flush").await,
 
+            // RustHound-CE: full collection into the current directory, zipped
+            "rusthound" | "rusthound_ce" => rusthound_ce::run(ldap, base_opts).await,
+
             other => { println!("unknown command '{other}' (try 'help')"); Ok(()) }
         };
 
@@ -81,7 +84,7 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
 
 // Helpers that build a per-command Options from the base connection options.
 
-fn with<'a>(base: &Options) -> Options {
+fn with(base: &Options) -> Options {
     base.clone()
 }
 
@@ -201,6 +204,7 @@ fn print_help() {
          \x20 write_rbcd <target$> <from$>    allow from$ to impersonate on target$\n\
          \x20 remove_rbcd <target$> <from$>   remove one RBCD entry\n\
          \x20 flush_rbcd <target$>            clear all RBCD entries\n\
+         \x20 rusthound_ce                    run a full RustHound-CE collection (current dir, zipped)\n\
          \x20 help                            this help\n\
          \x20 exit | quit                     leave"
     );

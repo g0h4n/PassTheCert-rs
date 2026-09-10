@@ -23,26 +23,27 @@ async fn main() -> Result<()> {
     log::info!("[+] certificate authentication OK");
 
     match opts.action.as_str() {
-        "whoami"      => { actions::whoami::run(&mut ldap).await?; }
-        "ldapshell"   => actions::ldapshell::run(&mut ldap, &opts).await?,
-        "add_computer"=> actions::add_computer::run(&mut ldap, &opts).await?,
-        "del_computer"=> actions::add_computer::del_computer(&mut ldap, &opts).await?,
-        "modify_user" => {
+        "whoami"            => { actions::whoami::run(&mut ldap).await?; }
+        "ldapshell"         => actions::ldapshell::run(&mut ldap, &opts).await?,
+        "add_computer"      => actions::add_computer::run(&mut ldap, &opts).await?,
+        "del_computer"      => actions::add_computer::del_computer(&mut ldap, &opts).await?,
+        "modify_user"       => {
             if opts.elevate {
                 actions::modify_user::elevate(&mut ldap, &opts).await?;
             } else {
                 actions::modify_user::change_password(&mut ldap, &opts).await?;
             }
         }
-        "add_member"       => actions::group::add_member(&mut ldap, &opts).await?,
-        "remove_member"    => actions::group::remove_member(&mut ldap, &opts).await?,
-        "enable_account"   => actions::account::enable(&mut ldap, &opts).await?,
-        "disable_account"  => actions::account::disable(&mut ldap, &opts).await?,
-        "read_rbcd"   => actions::rbcd::read(&mut ldap, &opts).await?,
-        "write_rbcd"  => actions::rbcd::write(&mut ldap, &opts).await?,
-        "remove_rbcd" => actions::rbcd::remove(&mut ldap, &opts).await?,
-        "flush_rbcd"  => actions::rbcd::flush(&mut ldap, &opts).await?,
-        other => return Err(anyhow!("unknown action: {other}")),
+        "add_member"        => actions::group::add_member(&mut ldap, &opts).await?,
+        "remove_member"     => actions::group::remove_member(&mut ldap, &opts).await?,
+        "enable_account"    => actions::account::enable(&mut ldap, &opts).await?,
+        "disable_account"   => actions::account::disable(&mut ldap, &opts).await?,
+        "read_rbcd"         => actions::rbcd::read(&mut ldap, &opts).await?,
+        "write_rbcd"        => actions::rbcd::write(&mut ldap, &opts).await?,
+        "remove_rbcd"       => actions::rbcd::remove(&mut ldap, &opts).await?,
+        "flush_rbcd"        => actions::rbcd::flush(&mut ldap, &opts).await?,
+        "rusthound_ce"      => actions::rusthound_ce::run(&mut ldap, &opts).await?,
+        other         => return Err(anyhow!("unknown action: {other}")),
     }
 
     let _ = ldap.unbind().await;

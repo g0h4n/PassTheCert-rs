@@ -122,7 +122,8 @@ fn cli() -> Command {
                 .long("action")
                 .help("whoami | ldapshell | add_computer | del_computer | modify_user | \
                        add_member | remove_member | enable_account | disable_account | \
-                       read_rbcd | write_rbcd | remove_rbcd | flush_rbcd [default: whoami]")
+                       read_rbcd | write_rbcd | remove_rbcd | flush_rbcd | rusthound_ce \
+                       [default: whoami]")
                 .required(false)
                 .value_parser([
                     "whoami", "ldapshell",
@@ -131,6 +132,7 @@ fn cli() -> Command {
                     "add_member", "remove_member",
                     "enable_account", "disable_account",
                     "read_rbcd", "write_rbcd", "remove_rbcd", "flush_rbcd",
+                    "rusthound_ce",
                 ]),
         )
         .next_help_heading("MANAGE USER (modify_user)")
