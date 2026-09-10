@@ -97,6 +97,7 @@ to `<conn>` = `-d essos.local -f meereen.essos.local --crt daenerys.crt --key da
 | `write_rbcd` | `passthecert-rs <conn> --action write_rbcd --delegate-to "MEEREEN$" --delegate-from "EVIL$"` | Allow `--delegate-from` to impersonate on `--delegate-to` via S4U2Proxy. |
 | `remove_rbcd` | `passthecert-rs <conn> --action remove_rbcd --delegate-to "MEEREEN$" --delegate-from "EVIL$"` | Remove one RBCD entry from the target. |
 | `flush_rbcd` | `passthecert-rs <conn> --action flush_rbcd --delegate-to "MEEREEN$"` | Clear all RBCD entries on the target. |
+| `rusthound_ce` | `passthecert-rs <conn> --action rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 ## ldap-shell commands
 
@@ -119,6 +120,7 @@ read_rbcd <target$>             list RBCD entries
 write_rbcd <target$> <from$>    allow from$ to impersonate on target$
 remove_rbcd <target$> <from$>   remove one RBCD entry
 flush_rbcd <target$>            clear all RBCD entries
+rusthound_ce                    run a full RustHound-CE collection (current dir, zipped)
 help | exit
 ```
 
