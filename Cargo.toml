@@ -1,6 +1,6 @@
 [package]
 name = "passthecert-rs"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Pass-the-Certificate (Schannel) authentication and LDAP attack actions in pure Rust (RustHound-CE issue #31)"
 license = "MIT"
@@ -28,3 +28,6 @@ rustls-pki-types = "1"
 
 # PKCS#12 (.pfx) parsing, pure Rust.
 p12-keystore = "0.3"
+
+# RustHound-CE
+rusthound-ce = { version = "2.5.13"}
