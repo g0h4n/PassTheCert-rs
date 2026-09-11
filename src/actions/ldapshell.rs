@@ -11,7 +11,7 @@ use anyhow::Result;
 use ldap3::{Ldap, Scope, SearchEntry};
 use log::warn;
 
-use crate::actions::{account, add_computer, group, modify_user, rbcd, rusthound_ce, whoami};
+use crate::actions::{account, add_computer, group, modify_user, rbcd, rusthound_ce, shadow_cred, whoami};
 use crate::args::Options;
 
 pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
@@ -71,6 +71,12 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
 
             // RustHound-CE: full collection into the current directory, zipped
             "rusthound" | "rusthound_ce" => rusthound_ce::run(ldap, base_opts).await,
+
+            // Shadow Credentials (Key Trust / msDS-KeyCredentialLink)
+            "add_shadow_cred" | "shadow_add" => run_shadow_add(ldap, base_opts, rest).await,
+            "list_shadow_cred" | "shadow_list" => run_shadow_list(ldap, base_opts, rest).await,
+            "remove_shadow_cred" | "shadow_remove" => run_shadow_remove(ldap, base_opts, rest).await,
+            "flush_shadow_cred" | "shadow_flush" => run_shadow_flush(ldap, base_opts, rest).await,
 
             other => { println!("unknown command '{other}' (try 'help')"); Ok(()) }
         };
@@ -148,6 +154,48 @@ async fn run_del_computer(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result
     add_computer::del_computer(ldap, &o).await
 }
 
+async fn run_shadow_add(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
+    if a.is_empty() {
+        println!("usage: add_shadow_cred <target_sAMAccountName>");
+        return Ok(());
+    }
+    let mut o = with(base);
+    o.shadow_target = Some(a[0].to_string());
+    shadow_cred::add(ldap, &o).await
+}
+
+async fn run_shadow_list(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
+    if a.is_empty() {
+        println!("usage: list_shadow_cred <target_sAMAccountName>");
+        return Ok(());
+    }
+    let mut o = with(base);
+    o.shadow_target = Some(a[0].to_string());
+    shadow_cred::list(ldap, &o).await
+}
+
+async fn run_shadow_remove(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
+    if a.len() < 2 {
+        println!("usage: remove_shadow_cred <target_sAMAccountName> <key_id_hex>");
+        println!("       (get KeyID from list_shadow_cred)");
+        return Ok(());
+    }
+    let mut o = with(base);
+    o.shadow_target = Some(a[0].to_string());
+    o.shadow_key_id = Some(a[1].to_string());
+    shadow_cred::remove(ldap, &o).await
+}
+
+async fn run_shadow_flush(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
+    if a.is_empty() {
+        println!("usage: flush_shadow_cred <target_sAMAccountName>");
+        return Ok(());
+    }
+    let mut o = with(base);
+    o.shadow_target = Some(a[0].to_string());
+    shadow_cred::flush(ldap, &o).await
+}
+
 async fn run_rbcd(ldap: &mut Ldap, base: &Options, a: &[&str], op: &str) -> Result<()> {
     if a.is_empty() {
         println!("usage: {op}_rbcd <target$> [from$]");
@@ -189,23 +237,27 @@ async fn do_search(ldap: &mut Ldap, a: &[&str]) {
 fn print_help() {
     println!(
         "commands:\n\
-         \x20 whoami                          show the mapped identity\n\
-         \x20 search <baseDN> [filter]        subtree search, prints DNs\n\
-         \x20 dn <baseDN>                     search <baseDN> (objectClass=*)\n\
-         \x20 add_member <user> <group>       add user/computer to a group\n\
-         \x20 del_member <user> <group>       remove user/computer from a group\n\
-         \x20 enable <user>                   enable an account (clear ACCOUNTDISABLE)\n\
-         \x20 disable <user>                  disable an account (set ACCOUNTDISABLE)\n\
-         \x20 passwd <user> [newpass]         reset a user's password\n\
-         \x20 elevate <user>                  grant the user DCSync rights\n\
-         \x20 add_computer [name$] [pass]     create a machine account\n\
-         \x20 del_computer <name$>            delete a machine account\n\
-         \x20 read_rbcd <target$>             list RBCD entries on target\n\
-         \x20 write_rbcd <target$> <from$>    allow from$ to impersonate on target$\n\
-         \x20 remove_rbcd <target$> <from$>   remove one RBCD entry\n\
-         \x20 flush_rbcd <target$>            clear all RBCD entries\n\
-         \x20 rusthound_ce                    run a full RustHound-CE collection (current dir, zipped)\n\
-         \x20 help                            this help\n\
-         \x20 exit | quit                     leave"
+         \x20 whoami                               show the mapped identity\n\
+         \x20 search <baseDN> [filter]             subtree search, prints DNs\n\
+         \x20 dn <baseDN>                          search <baseDN> (objectClass=*)\n\
+         \x20 add_member <user> <group>            add user/computer to a group\n\
+         \x20 del_member <user> <group>            remove user/computer from a group\n\
+         \x20 enable <user>                        enable an account (clear ACCOUNTDISABLE)\n\
+         \x20 disable <user>                       disable an account (set ACCOUNTDISABLE)\n\
+         \x20 passwd <user> [newpass]              reset a user's password\n\
+         \x20 elevate <user>                       grant the user DCSync rights\n\
+         \x20 add_computer [name$] [pass]          create a machine account\n\
+         \x20 del_computer <name$>                 delete a machine account\n\
+         \x20 read_rbcd <target$>                  list RBCD entries on target\n\
+         \x20 write_rbcd <target$> <from$>         allow from$ to impersonate on target$\n\
+         \x20 remove_rbcd <target$> <from$>        remove one RBCD entry\n\
+         \x20 flush_rbcd <target$>                 clear all RBCD entries\n\
+         \x20 add_shadow_cred <target>             add Key Credential (saves .crt + .key)\n\
+         \x20 list_shadow_cred <target>            list shadow credentials on target\n\
+         \x20 remove_shadow_cred <target> <keyid>  remove one shadow credential by KeyID\n\
+         \x20 flush_shadow_cred <target>           clear all shadow credentials on target\n\
+         \x20 rusthound_ce                         run a full RustHound-CE collection (current dir, zipped)\n\
+         \x20 help                                 this help\n\
+         \x20 exit | quit                          leave"
     );
 }

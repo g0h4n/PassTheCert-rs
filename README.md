@@ -66,15 +66,18 @@ More examples and the full list of actions are on the [help page](HELP.md).
 
 # Actions
 
+# Actions
+
 | Action | Description |
 |---|---|
 | `whoami` | Confirm the mapped identity (RFC 4532). |
-| `ldapshell` | Interactive LDAP shell exposing every action (search, elevate, RBCD, add_computer, …). |
+| `ldapshell` | Interactive LDAP shell exposing every action (search, elevate, RBCD, add_computer, shadow credentials, …). |
 | `add_computer` / `del_computer` | Create or delete a machine account. |
 | `modify_user` | Reset a user's password, or `--elevate` to grant DCSync. |
 | `add_member` / `remove_member` | Add or remove a group member. |
 | `enable_account` / `disable_account` | Toggle the account's ACCOUNTDISABLE flag. |
 | `read_rbcd` / `write_rbcd` / `remove_rbcd` / `flush_rbcd` | Manage Resource-Based Constrained Delegation. |
+| `add_shadow_cred` / `list_shadow_cred` / `remove_shadow_cred` / `flush_shadow_cred` | Manage Shadow Credentials (Key Trust) via `msDS-KeyCredentialLink`; `add` saves a cert+key for PKINIT. |
 | `rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 See [HELP.md](HELP.md) for a full table with example commands.

@@ -43,6 +43,10 @@ async fn main() -> Result<()> {
         "remove_rbcd"       => actions::rbcd::remove(&mut ldap, &opts).await?,
         "flush_rbcd"        => actions::rbcd::flush(&mut ldap, &opts).await?,
         "rusthound_ce"      => actions::rusthound_ce::run(&mut ldap, &opts).await?,
+        "list_shadow_cred"   => actions::shadow_cred::list(&mut ldap, &opts).await?,
+        "add_shadow_cred"    => actions::shadow_cred::add(&mut ldap, &opts).await?,
+        "remove_shadow_cred" => actions::shadow_cred::remove(&mut ldap, &opts).await?,
+        "flush_shadow_cred"  => actions::shadow_cred::flush(&mut ldap, &opts).await?,
         other         => return Err(anyhow!("unknown action: {other}")),
     }
 
