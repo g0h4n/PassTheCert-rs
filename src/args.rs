@@ -30,6 +30,9 @@ pub struct Options {
     // RBCD (read/write/remove/flush)
     pub delegate_to: Option<String>,
     pub delegate_from: Option<String>,
+    // Shadow Credentials (add/list/remove/flush_shadow_cred)
+    pub shadow_target: Option<String>,
+    pub shadow_key_id: Option<String>,
     // Verbosity
     pub verbose: log::LevelFilter,
 }
@@ -122,8 +125,9 @@ fn cli() -> Command {
                 .long("action")
                 .help("whoami | ldapshell | add_computer | del_computer | modify_user | \
                        add_member | remove_member | enable_account | disable_account | \
-                       read_rbcd | write_rbcd | remove_rbcd | flush_rbcd | rusthound_ce \
-                       [default: whoami]")
+                       read_rbcd | write_rbcd | remove_rbcd | flush_rbcd | \
+                       add_shadow_cred | list_shadow_cred | remove_shadow_cred | flush_shadow_cred | \
+                       rusthound_ce  [default: whoami]")
                 .required(false)
                 .value_parser([
                     "whoami", "ldapshell",
@@ -132,6 +136,8 @@ fn cli() -> Command {
                     "add_member", "remove_member",
                     "enable_account", "disable_account",
                     "read_rbcd", "write_rbcd", "remove_rbcd", "flush_rbcd",
+                    "add_shadow_cred", "list_shadow_cred",
+                    "remove_shadow_cred", "flush_shadow_cred",
                     "rusthound_ce",
                 ]),
         )
@@ -202,6 +208,21 @@ fn cli() -> Command {
                 .required(false)
                 .value_parser(value_parser!(String)),
         )
+        .next_help_heading("SHADOW CREDENTIALS (add/list/remove/flush_shadow_cred)")
+        .arg(
+            Arg::new("shadow-target")
+                .long("shadow-target")
+                .help("Target account sAMAccountName (user or machine$)")
+                .required(false)
+                .value_parser(value_parser!(String)),
+        )
+        .arg(
+            Arg::new("shadow-key-id")
+                .long("shadow-key-id")
+                .help("KeyID (lowercase hex, 32 chars) to remove — from list_shadow_cred")
+                .required(false)
+                .value_parser(value_parser!(String)),
+        )
 }
 
 /// Extract all arguments into the `Options` structure.
@@ -239,6 +260,8 @@ pub fn extract_args() -> Options {
         group:          m.get_one::<String>("group").cloned(),
         delegate_to:    m.get_one::<String>("delegate-to").cloned(),
         delegate_from:  m.get_one::<String>("delegate-from").cloned(),
+        shadow_target:  m.get_one::<String>("shadow-target").cloned(),
+        shadow_key_id:  m.get_one::<String>("shadow-key-id").cloned(),
         verbose,
     }
 }
