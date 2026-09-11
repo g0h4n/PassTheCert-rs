@@ -67,8 +67,6 @@ More examples and the full list of actions are on the [help page](HELP.md).
 
 # Actions
 
-# Actions
-
 | Action | Description |
 |---|---|
 | `whoami` | Confirm the mapped identity (RFC 4532). |
