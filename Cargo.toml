@@ -29,5 +29,11 @@ rustls-pki-types = "1"
 # PKCS#12 (.pfx) parsing, pure Rust.
 p12-keystore = "0.3"
 
+# Shadow Credentials: EC P-256 key pair + self-signed cert + SHA-256 hash.
+rcgen = { version = "0.13", features = ["ring"] }
+sha2  = "0.10"
+rsa   = "0.9"
+time  = "0.3"
+
 # RustHound-CE
 rusthound-ce = { version = "2.5.13", default-features = false, features = ["nogssapi"] }
