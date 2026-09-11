@@ -2,6 +2,7 @@ target/
 *.key
 *.crt
 *.pfx
+*.ccache
 passthecert*
 *.zip
 *.json
