@@ -17,6 +17,7 @@
 It was built to prototype Pass-the-Certificate support for [RustHound-CE](https://github.com/g0h4n/RustHound-CE) ([issue #31](https://github.com/g0h4n/RustHound-CE/issues/31)), and uses the same TLS stack (`ldap3` + `rustls`). The Kerberos-less certificate authentication is useful when a Domain Controller does not support PKINIT (e.g. its certificate lacks the Smart Card Logon EKU) but LDAP over Schannel is available. Because authentication happens through Schannel, it also works where LDAP Channel Binding is enforced.
 
 - [HELP.md](HELP.md) - How to compile it? How to use it? All actions with examples.
+- [CHANGELOG.md](CHANGELOG.md) - A record of all significant version changes
 - [ROADMAP.md](ROADMAP.md) - Implemented actions and planned evolutions.
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute to the project.
 
