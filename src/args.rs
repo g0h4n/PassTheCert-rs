@@ -127,7 +127,7 @@ fn cli() -> Command {
                        add_member | remove_member | enable_account | disable_account | \
                        read_rbcd | write_rbcd | remove_rbcd | flush_rbcd | \
                        add_shadow_cred | list_shadow_cred | remove_shadow_cred | flush_shadow_cred | \
-                       read_object | rusthound_ce  [default: whoami]")
+                       read_object | rusthound_ce  [default: ldapshell]")
                 .required(false)
                 .value_parser([
                     "whoami", "ldapshell",
@@ -233,7 +233,7 @@ pub fn extract_args() -> Options {
     let action = m
         .get_one::<String>("action")
         .cloned()
-        .unwrap_or_else(|| "whoami".to_string());
+        .unwrap_or_else(|| "ldapshell".to_string());
 
     let verbose = match m.get_count("v") {
         0 => log::LevelFilter::Info,

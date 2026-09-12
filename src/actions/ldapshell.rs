@@ -31,7 +31,7 @@ fn build_editor() -> Result<ShellEditor> {
 }
 
 pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
-    println!("passthecert-rs ldap-shell. type 'help' for commands, 'exit' to quit.");
+    println!("passthecert-rs ldap-shell. type 'help' or '?' for commands, 'exit' to quit.");
     println!("(Tab completes commands, up/down browse history, Ctrl-C cancels a line, Ctrl-D quits)");
 
     // rustyline is blocking; the REPL is async. We move the editor into a
@@ -75,8 +75,8 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
 
         // Each command dispatches to an action; errors are printed, never fatal.
         let result: Result<()> = match cmd {
-            "exit" | "quit" => break,
-            "help" => { print_help(); Ok(()) }
+            "exit" | "quit" | "q" => break,
+            "help" | "?" | "h" => { print_help(); Ok(()) }
 
             // Read-only
             "whoami" => whoami::run(ldap).await.map(|_| ()),
