@@ -41,14 +41,14 @@ The goal is parity with (and eventually more than) [AlmondOffSec/PassTheCert](ht
 - [ ] `write_dacl` — add a generic ACE on an arbitrary object :red_circle:
 
 ### Shadow Credentials (Key Trust)
-- [x] `add_shadow_cred` — add a Key Credential (`msDS-KeyCredentialLink`) :red_circle:
-- [x] `remove_shadow_cred` / `list_shadow_cred` :red_circle:
+- [x] `add_shadow_cred` — add a Key Credential (`msDS-KeyCredentialLink`) :white_check_mark:
+- [x] `remove_shadow_cred` / `list_shadow_cred` :white_check_mark:
 
 ### Delegation
 - [ ] Constrained delegation write (`msDS-AllowedToDelegateTo`) on add_computer :red_circle:
 - [ ] Unconstrained delegation flag toggle (`TRUSTED_FOR_DELEGATION`) :red_circle:
 
 ## ldapshell improvements
-- [ ] Show attributes, not only DNs :red_circle:
-- [ ] Inline write commands (set_rbcd, add_member, elevate…) from the shell :red_circle:
-- [ ] Tab completion / history :red_circle:
+- [x] Show attributes, not only DNs :white_check_mark:
+- [x] Inline write commands (set_rbcd, add_member, elevate…) from the shell :white_check_mark:
+- [x] Tab completion / history :white_check_mark:

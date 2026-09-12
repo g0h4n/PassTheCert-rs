@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4 - 2026-09-12
+
+Upgrade the interactive `ldapshell` from a raw line reader to a proper shell using rustyline. Command names are Tab-completed, the up/down arrows browse the session history, and the usual line-editing shortcuts (left/right, Ctrl-A/E/W/U/K, Ctrl-R history search) all work; previously these keys left raw escape sequences on the line and every command had to be retyped in full.
+
+rustyline is blocking while the REPL is async, so each read runs in a `tokio::task::spawn_blocking` with the editor moved in and back out, keeping the runtime and the LDAP actions fully async. History is kept in memory only and never written to disk. `Ctrl-C` cancels the current line and keeps the shell open; `Ctrl-D` quits. No command, argument or action behaviour changed — only the input layer. New dependency: `rustyline`.
+
 ## 1.0.3 - 2026-09-12
 
 Add the `read_object` action, dumping every attribute of a single AD object (user, computer, group, OU, container, ...) over the certificate-authenticated session. The target is resolved by sAMAccountName (with or without a trailing `$`), CN, name, or full DN, and a `Scope::Base` search requests both all user attributes (`*`) and all operational attributes (`+`).

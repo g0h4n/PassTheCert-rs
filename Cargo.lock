@@ -2256,7 +2256,7 @@ dependencies = [
 
 [[package]]
 name = "passthecert-rs"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "anyhow",
  "clap",
