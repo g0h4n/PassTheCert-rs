@@ -127,7 +127,7 @@ fn cli() -> Command {
                        add_member | remove_member | enable_account | disable_account | \
                        read_rbcd | write_rbcd | remove_rbcd | flush_rbcd | \
                        add_shadow_cred | list_shadow_cred | remove_shadow_cred | flush_shadow_cred | \
-                       rusthound_ce  [default: whoami]")
+                       read_object | rusthound_ce  [default: whoami]")
                 .required(false)
                 .value_parser([
                     "whoami", "ldapshell",
@@ -138,6 +138,7 @@ fn cli() -> Command {
                     "read_rbcd", "write_rbcd", "remove_rbcd", "flush_rbcd",
                     "add_shadow_cred", "list_shadow_cred",
                     "remove_shadow_cred", "flush_shadow_cred",
+                    "read_object",
                     "rusthound_ce",
                 ]),
         )
