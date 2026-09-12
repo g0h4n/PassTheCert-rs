@@ -5,25 +5,65 @@
 //! the base connection options plus the arguments typed on the line, then calls
 //! the matching action module.
 
-use std::io::{self, Write};
-
 use anyhow::Result;
 use ldap3::{Ldap, Scope, SearchEntry};
 use log::warn;
+use rustyline::error::ReadlineError;
+use rustyline::history::MemHistory;
+use rustyline::{Config, Editor};
 
+use crate::actions::shell_completer::ShellHelper;
 use crate::actions::{account, add_computer, group, modify_user, rbcd, read_object, rusthound_ce, shadow_cred, whoami};
 use crate::args::Options;
 
+// The rustyline editor type: our command completer + an in-memory history
+// (nothing is written to disk, for OPSEC).
+type ShellEditor = Editor<ShellHelper, MemHistory>;
+
+fn build_editor() -> Result<ShellEditor> {
+    let config = Config::builder()
+        .auto_add_history(true)
+        .completion_type(rustyline::CompletionType::List)
+        .build();
+    let mut editor = Editor::with_history(config, MemHistory::new())?;
+    editor.set_helper(Some(ShellHelper));
+    Ok(editor)
+}
+
 pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
     println!("passthecert-rs ldap-shell. type 'help' for commands, 'exit' to quit.");
-    loop {
-        print!("# ");
-        io::stdout().flush().ok();
+    println!("(Tab completes commands, up/down browse history, Ctrl-C cancels a line, Ctrl-D quits)");
 
-        let mut line = String::new();
-        if io::stdin().read_line(&mut line)? == 0 {
-            break; // EOF (Ctrl-D)
-        }
+    // rustyline is blocking; the REPL is async. We move the editor into a
+    // blocking task for each readline call and move it back out, so line
+    // editing never blocks the tokio runtime.
+    let mut editor = build_editor()?;
+
+    loop {
+        let (line_result, ed) = tokio::task::spawn_blocking(move || {
+            let res = editor.readline("# ");
+            (res, editor)
+        })
+        .await
+        .expect("readline task panicked");
+        editor = ed;
+
+        let line = match line_result {
+            Ok(l) => l,
+            Err(ReadlineError::Interrupted) => {
+                // Ctrl-C: abandon the current line, keep the shell open.
+                continue;
+            }
+            Err(ReadlineError::Eof) => {
+                // Ctrl-D: leave the shell.
+                break;
+            }
+            Err(e) => {
+                warn!("readline error: {e}");
+                break;
+            }
+        };
+
         let line = line.trim();
         if line.is_empty() {
             continue;
@@ -273,6 +313,9 @@ fn print_help() {
          \x20 read_object <name|DN>                dump every attribute of an object\n\
          \x20 rusthound_ce                         run a full RustHound-CE collection (current dir, zipped)\n\
          \x20 help                                 this help\n\
-         \x20 exit | quit                          leave"
+         \x20 exit | quit                          leave\n\
+         \n\
+         Line editing: Tab completes commands, up/down browse history,\n\
+         Ctrl-C cancels the current line, Ctrl-D quits."
     );
 }
