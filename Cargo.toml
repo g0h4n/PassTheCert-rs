@@ -12,6 +12,9 @@ path = "src/main.rs"
 [dependencies]
 tokio      = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }
 clap       = "4.5"
+
+# Interactive ldap-shell: line editing, arrow-key history, Tab completion.
+rustyline  = "14"
 anyhow     = "1"
 log        = "0.4"
 env_logger = "0.11"
