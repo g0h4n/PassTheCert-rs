@@ -110,7 +110,7 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
             "flush_rbcd" => run_rbcd(ldap, base_opts, rest, "flush").await,
 
             // RustHound-CE: full collection into the current directory, zipped
-            "rusthound" | "rusthound_ce" => rusthound_ce::run(ldap, base_opts).await,
+            "rusthound" | "rusthound_ce" | "rusthound-ce" => rusthound_ce::run(ldap, base_opts).await,
 
             // Dump every attribute of an object (user/computer/group/OU/...)
             "read_object" | "read" | "dump" | "get_object" => run_read_object(ldap, base_opts, rest).await,
