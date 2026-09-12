@@ -11,7 +11,7 @@ use anyhow::Result;
 use ldap3::{Ldap, Scope, SearchEntry};
 use log::warn;
 
-use crate::actions::{account, add_computer, group, modify_user, rbcd, rusthound_ce, shadow_cred, whoami};
+use crate::actions::{account, add_computer, group, modify_user, rbcd, read_object, rusthound_ce, shadow_cred, whoami};
 use crate::args::Options;
 
 pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
@@ -71,6 +71,9 @@ pub async fn run(ldap: &mut Ldap, base_opts: &Options) -> Result<()> {
 
             // RustHound-CE: full collection into the current directory, zipped
             "rusthound" | "rusthound_ce" => rusthound_ce::run(ldap, base_opts).await,
+
+            // Dump every attribute of an object (user/computer/group/OU/...)
+            "read_object" | "read" | "dump" | "get_object" => run_read_object(ldap, base_opts, rest).await,
 
             // Shadow Credentials (Key Trust / msDS-KeyCredentialLink)
             "add_shadow_cred" | "shadow_add" => run_shadow_add(ldap, base_opts, rest).await,
@@ -152,6 +155,17 @@ async fn run_del_computer(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result
     let mut o = with(base);
     o.computer_name = Some(a[0].to_string());
     add_computer::del_computer(ldap, &o).await
+}
+
+async fn run_read_object(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
+    if a.is_empty() {
+        println!("usage: read_object <sAMAccountName | CN | DN>");
+        return Ok(());
+    }
+    // Join args so quoted DNs / names with spaces still work.
+    let mut o = with(base);
+    o.target = Some(a.join(" "));
+    read_object::run(ldap, &o).await
 }
 
 async fn run_shadow_add(ldap: &mut Ldap, base: &Options, a: &[&str]) -> Result<()> {
@@ -256,6 +270,7 @@ fn print_help() {
          \x20 list_shadow_cred <target>            list shadow credentials on target\n\
          \x20 remove_shadow_cred <target> <keyid>  remove one shadow credential by KeyID\n\
          \x20 flush_shadow_cred <target>           clear all shadow credentials on target\n\
+         \x20 read_object <name|DN>                dump every attribute of an object\n\
          \x20 rusthound_ce                         run a full RustHound-CE collection (current dir, zipped)\n\
          \x20 help                                 this help\n\
          \x20 exit | quit                          leave"
