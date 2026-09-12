@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3 - 2026-09-12
+
+Add the `read_object` action, dumping every attribute of a single AD object (user, computer, group, OU, container, ...) over the certificate-authenticated session. The target is resolved by sAMAccountName (with or without a trailing `$`), CN, name, or full DN, and a `Scope::Base` search requests both all user attributes (`*`) and all operational attributes (`+`).
+
+Values are decoded for readability rather than printed raw: `objectSid` as `S-1-5-21-...`, `objectGUID` as a canonical Windows GUID, `userAccountControl` as its named flags (`NORMAL_ACCOUNT`, `ACCOUNTDISABLE`, `TRUSTED_FOR_DELEGATION`, `DONT_REQ_PREAUTH`, ...), FILETIME attributes (`pwdLastSet`, `lastLogon`, `accountExpires`, ...) as UTC dates with the AD "never" sentinels handled, and opaque blobs (`nTSecurityDescriptor`, `msDS-KeyCredentialLink`, `userCertificate`, ...) as a size plus hex preview. The action reuses the existing `--target` option and is also available as the `read_object` / `dump` / `get_object` / `read` command in the ldap-shell. Read-only: no object is modified.
+
 ## 1.0.2 - 2026-09-11
 
 Add Shadow Credentials (Key Trust) support through four new actions operating on the `msDS-KeyCredentialLink` attribute of a target account: `add_shadow_cred`, `list_shadow_cred`, `remove_shadow_cred` and `flush_shadow_cred`. All four are available both as `--action` flags (with the new `--shadow-target` and `--shadow-key-id` options) and as interactive `ldapshell` commands, with `-v`/`-vv` debug and trace logging.

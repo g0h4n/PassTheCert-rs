@@ -7,14 +7,14 @@
     <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
     <img alt="Platforms" src="https://img.shields.io/badge/platforms-linux%20%7C%20windows%20%7C%20macos-lightgrey.svg">
     <img alt="TLS" src="https://img.shields.io/badge/TLS-rustls-informational.svg">
-    <a href="https://github.com/g0h4n/RustHound-CE/issues/31"><img alt="RustHound-CE #31" src="https://img.shields.io/badge/RustHound--CE-%2331-8A2BE2.svg"></a>
+    <a href="https://github.com/g0h4n/passthecert-rs/issues/31"><img alt="passthecert-rs #31" src="https://img.shields.io/badge/RustHound--CE-%2331-8A2BE2.svg"></a>
 </p>
 
 <hr />
 
 **PassTheCert-rs** is a cross-platform, pure-Rust implementation of the [PassTheCert](https://github.com/AlmondOffSec/PassTheCert) technique: it authenticates to an LDAP/S server with a **client certificate** through Schannel, and performs a set of LDAP attack actions over that certificate-authenticated session, no password, no NT hash, no PKINIT.
 
-It was built to prototype Pass-the-Certificate support for [RustHound-CE](https://github.com/g0h4n/RustHound-CE) ([issue #31](https://github.com/g0h4n/RustHound-CE/issues/31)), and uses the same TLS stack (`ldap3` + `rustls`). The Kerberos-less certificate authentication is useful when a Domain Controller does not support PKINIT (e.g. its certificate lacks the Smart Card Logon EKU) but LDAP over Schannel is available. Because authentication happens through Schannel, it also works where LDAP Channel Binding is enforced.
+It was built to prototype Pass-the-Certificate support for [passthecert-rs](https://github.com/g0h4n/passthecert-rs) ([issue #31](https://github.com/g0h4n/passthecert-rs/issues/31)), and uses the same TLS stack (`ldap3` + `rustls`). The Kerberos-less certificate authentication is useful when a Domain Controller does not support PKINIT (e.g. its certificate lacks the Smart Card Logon EKU) but LDAP over Schannel is available. Because authentication happens through Schannel, it also works where LDAP Channel Binding is enforced.
 
 - [HELP.md](HELP.md) - How to compile it? How to use it? All actions with examples.
 - [CHANGELOG.md](CHANGELOG.md) - A record of all significant version changes
@@ -29,6 +29,15 @@ It was built to prototype Pass-the-Certificate support for [RustHound-CE](https:
 # Build a release binary
 cargo build --release
 # Binary: ./target/release/passthecert-rs
+```
+
+## Installation
+
+<a href="https://crates.io/crates/passthecert-rs"><img alt="Crates.io Version" src="https://img.shields.io/crates/v/passthecert-rs"> <img alt="Crates.io Total Downloads" src="https://img.shields.io/crates/d/passthecert-rs?color=f74c00"></a>
+
+```bash
+# Install and/or update passthecert-rs from cargo command
+cargo install passthecert-rs
 ```
 
 ## Getting a certificate
@@ -78,7 +87,7 @@ More examples and the full list of actions are on the [help page](HELP.md).
 | `read_rbcd` / `write_rbcd` / `remove_rbcd` / `flush_rbcd` | Manage Resource-Based Constrained Delegation. |
 | `add_shadow_cred` / `list_shadow_cred` / `remove_shadow_cred` / `flush_shadow_cred` | Manage Shadow Credentials (Key Trust) via `msDS-KeyCredentialLink`; `add` saves a cert+key for PKINIT. |
 | `read_object`,`read`,`dump` | Dump every attribute of an object (user/computer/group/OU); decodes SID, GUID, UAC flags and timestamps. |
-| `rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
+| `rusthound_ce` | Run a full passthecert-rs (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 See [HELP.md](HELP.md) for a full table with example commands.
 

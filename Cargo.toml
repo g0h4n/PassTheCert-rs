@@ -1,6 +1,6 @@
 [package]
 name = "passthecert-rs"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 description = "Pass-the-Certificate (Schannel) authentication and LDAP attack actions in pure Rust (RustHound-CE issue #31)"
 license = "MIT"
