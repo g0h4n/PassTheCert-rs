@@ -102,6 +102,7 @@ to `<conn>` = `-d essos.local -f meereen.essos.local --crt daenerys.crt --key da
 | `list_shadow_cred` | `passthecert-rs <conn> --action list_shadow_cred --shadow-target viserys.targaryen` | List the Key Credentials on the target, showing each DeviceID (GUID) and creation time. |
 | `remove_shadow_cred` | `passthecert-rs <conn> --action remove_shadow_cred --shadow-target viserys.targaryen --shadow-key-id <DeviceID>` | Remove one Key Credential by DeviceID (from `list_shadow_cred`). |
 | `flush_shadow_cred` | `passthecert-rs <conn> --action flush_shadow_cred --shadow-target viserys.targaryen` | Clear all Key Credentials on the target. |
+| `read_object` | `passthecert-rs <conn> --action read_object --target khal.drogo` | Dump every attribute of an object (user, computer, group, OU, …). Accepts a sAMAccountName (with or without `$`), CN, or full DN. Decodes objectSid, objectGUID, userAccountControl flags and FILETIME timestamps. |
 | `rusthound_ce` | `passthecert-rs <conn> --action rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 ## ldap-shell commands
@@ -129,6 +130,7 @@ against the authenticated session. Available commands:
   list_shadow_cred <target>            list shadow credentials on target
   remove_shadow_cred <target> <keyid>  remove one shadow credential by KeyID
   flush_shadow_cred <target>           clear all shadow credentials on target
+  read_object <name|DN>                dump every attribute of an object
   rusthound_ce                         run a full RustHound-CE collection (current dir, zipped)
   help                                 this help
   exit | quit                          leave

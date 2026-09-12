@@ -77,6 +77,7 @@ More examples and the full list of actions are on the [help page](HELP.md).
 | `enable_account` / `disable_account` | Toggle the account's ACCOUNTDISABLE flag. |
 | `read_rbcd` / `write_rbcd` / `remove_rbcd` / `flush_rbcd` | Manage Resource-Based Constrained Delegation. |
 | `add_shadow_cred` / `list_shadow_cred` / `remove_shadow_cred` / `flush_shadow_cred` | Manage Shadow Credentials (Key Trust) via `msDS-KeyCredentialLink`; `add` saves a cert+key for PKINIT. |
+| `read_object`,`read`,`dump` | Dump every attribute of an object (user/computer/group/OU); decodes SID, GUID, UAC flags and timestamps. |
 | `rusthound_ce` | Run a full RustHound-CE (BloodHound-CE) collection over the certificate session, into the current directory, zipped. |
 
 See [HELP.md](HELP.md) for a full table with example commands.
