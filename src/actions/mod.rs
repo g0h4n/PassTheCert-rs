@@ -7,6 +7,7 @@ pub mod group;
 pub mod ldapshell;
 pub mod modify_user;
 pub mod rbcd;
+pub mod read_object;
 pub mod sd;
 pub mod shadow_cred;
 pub mod whoami;
